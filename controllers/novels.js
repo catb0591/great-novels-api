@@ -1,5 +1,4 @@
 /* eslint-disable no-console */
-
 const models = require('../models')
 
 const getAllNovelsWithAuthorsAndGenres = async (request, response) => {
@@ -20,10 +19,14 @@ const getAllNovelsWithAuthorsAndGenres = async (request, response) => {
 
 const getNovelWithAuthorAndGenre = async (request, response) => {
   try {
-    const { id } = request.params
+    const { identifier } = request.params
 
     const getNovelWithAuthorAndGenre = await models.novels.findOne({
-      where: { id },
+      where: {
+        [models.Op.or]: [
+          { id: { [models.Op.like]: `%${identifier}%` } },
+          { title: { [models.Op.like]: `%${identifier}%` } }]
+      },
       include: [
         { model: models.authors, attributes: ['id', 'nameFirst', 'nameLast', 'createdAt', 'updatedAt'] },
         { model: models.genres, attributes: ['id', 'name', 'createdAt', 'updatedAt'] }
